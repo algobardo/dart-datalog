@@ -7,7 +7,7 @@ import 'package:quiver/core.dart' as quiver;
 
 DLAtom Fact(String name, List<DLConstVar> args) => new DLAtom(name, (new LinkedListBuilder<DLConstVar>()..addAll(args)).build());
 DLVariable V(String name) => new DLVariable(name);
-DLConst C(String name) => new DLConst(name);
+DLConst C(dynamic item) => new DLConst(item);
 
 
 class Substitution {
