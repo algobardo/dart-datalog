@@ -1,19 +1,13 @@
 # dart_datalog
 
-A library for Dart developers. It is awesome.
+A tiny and stupid datalog implementation in Dart
 
-## Usage
-
-A simple usage example:
-
-    import 'package:dart_datalog/dart_datalog.dart';
-
-    main() {
-      var awesome = new Awesome();
-    }
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: http://example.com/issues/replaceme
+In the ```pubspec.yaml``` add the following:
+```
+dart_datalog:
+  git: git://github.com/algobardo/dart-datalog.git
+```
+Then import the library to your app:
+```
+import 'package:dart_datalog/dart_datalog.dart';
+```
