@@ -36,7 +36,7 @@ void main() {
       d.addFact(father(old, sam));
 
       expect(d.solveBU(gfather(V("A"), V("B"))), gfather(sam, bob));
-      
+
     });
   });
 }

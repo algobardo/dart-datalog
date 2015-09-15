@@ -104,19 +104,19 @@ class DLAtom extends DLTerm {
 }
 
 class DLConst extends DLConstVar {
-  String name;
+  dynamic item;
 
-  DLConst(this.name);
+  DLConst(this.item);
 
-  String toString() => "${this.name}";
+  String toString() => "${this.item}";
 
   Substitution unify(DLConstVar b) => b is DLVariable ? new Substitution.single(b, this) : new Substitution.empty();
 
   DLConst subst(Substitution s) => this;
 
-  operator ==(dynamic o) => o is DLConst && o.name == name;
+  operator ==(dynamic o) => o is DLConst && o.item == item;
 
-  int get hashCode => name.hashCode;
+  int get hashCode => item.hashCode;
 }
 
 class DLRule {
