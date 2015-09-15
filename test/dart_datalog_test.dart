@@ -6,16 +6,37 @@ library dart_datalog.test;
 import 'package:dart_datalog/dart_datalog.dart';
 import 'package:test/test.dart';
 
+
+DLAtom gfather(x, y) => Fact("gfather", [x, y]);
+DLAtom father(x, y) => Fact("father", [x, y]);
+DLVariable X = V("X");
+DLVariable Y = V("Y");
+DLVariable Z = V("Z");
+DLConst sam = C("sam");
+DLConst old = C("old");
+DLConst bob = C("bob");
+
+
 void main() {
-  group('A group of tests', () {
-    Awesome awesome;
+  group('Sample of formulas', () {
 
     setUp(() {
-      awesome = new Awesome();
+
     });
 
-    test('First Test', () {
-      expect(awesome.isAwesome, isTrue);
+    test('First', () {
+
+      DL d = new DL();
+
+      d.addRules([
+      gfather(X, Y) <= father(X, Z) ^ father(Z, Y)
+      ]);
+
+      d.addFact(father(sam, bob));
+      d.addFact(father(old, sam));
+
+      expect(d.solveBU(gfather(V("A"), V("B"))), gfather(sam, bob));
+      
     });
   });
 }
