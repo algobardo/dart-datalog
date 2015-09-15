@@ -134,7 +134,7 @@ class DLAnd extends DLTerm {
 
   DLAnd(this.goals);
 
-  DLAnd.list(List<DLAtom> l) : this(new PSet.from(l));
+  DLAnd.list(Iterable<DLAtom> l) : this(new PSet.from(l));
 
   DLAnd subst(Substitution subst) => new DLAnd(new PSet.from(goals.map((x) => x.subst(subst))));
 
