@@ -38,12 +38,9 @@ abstract class DLTerm {
 
   DLTerm subst(Substitution subst);
 
-  Substitution unify(DLTerm b);
-
-  Iterable<DLAtom> get atoms;
-
   bool get isGround;
 }
+
 abstract class DLConstVar {
 
   Substitution unify(DLConstVar b);
@@ -81,7 +78,7 @@ class DLAtom extends DLTerm {
 
   operator <=(DLTerm right) => new DLRule(this, right);
 
-  operator ^(DLAtom right) => new DLAnd(this, right);
+  operator ^(DLAtom right) => new DLAnd(new PSet.from([this, right]));
 
   Substitution unify(DLTerm b) {
     if (!(b is DLAtom && fact == b.fact && args.length == b.args.length)) return new Substitution.empty();
@@ -92,8 +89,6 @@ class DLAtom extends DLTerm {
     }
     return ret;
   }
-
-  Iterable<DLAtom> get atoms => new PSet().insert(this);
 
   operator ==(dynamic o) => o is DLAtom && o.fact == fact && o.args == args;
 
@@ -121,7 +116,7 @@ class DLConst extends DLConstVar {
 
 class DLRule {
   DLAtom left;
-  DLTerm right;
+  DLAnd right;
 
   DLRule(this.left, this.right);
 
@@ -135,24 +130,23 @@ class DLRule {
 }
 
 class DLAnd extends DLTerm {
-  DLTerm left;
-  DLTerm right;
+  PSet<DLAtom> goals;
 
-  DLAnd(this.left, this.right);
+  DLAnd(this.goals);
 
-  DLAnd subst(Substitution subst) => new DLAnd(left.subst(subst), right.subst(subst));
+  DLAnd.list(List<DLAtom> l) : this(new PSet.from(l));
 
-  Substitution unify(DLTerm b) => (b is DLAnd) ? left.unify(b.left).union(right.unify(b.right)) : new Substitution.empty();
+  DLAnd subst(Substitution subst) => new DLAnd(new PSet.from(goals.map((x) => x.subst(subst))));
 
-  Iterable<DLAtom> get atoms => new PSet.from(left.atoms).union(new PSet.from(right.atoms));
+  bool get isGround => goals.every((x) => x.isGround);
 
-  bool get isGround => left.isGround && right.isGround;
+  operator ^(DLAtom right) => new DLAnd(goals.insert(right));
 
-  operator ==(dynamic o) => o is DLAnd && o.left == left && o.right == right;
+  operator ==(dynamic o) => o is DLAnd && goals == o.goals;
 
-  int get hashCode => quiver.hash2(left, right);
+  int get hashCode => goals.hashCode;
 
-  String toString() => "$left & $right";
+  String toString() => "${goals.join(" & ")}";
 }
 
 class DL {
@@ -194,7 +188,7 @@ class DL {
       TSet<DLAtom> newFacts = new PSet().asTransient();
       for(DLRule rule in rules) {
         LinkedList<PSet<Substitution>> subst = (new LinkedListBuilder()..addAll(
-            rule.right.atoms.map(
+            rule.right.goals.map(
                 (DLAtom goal) => new PSet.from(
                     kb.map(
                         (DLAtom fact) => fact.unify(goal)
@@ -236,7 +230,7 @@ class DL {
     else return new PSet.from([new Substitution.empty()]);
   }
 
-  DLTerm unifiable(DLTerm a, DLTerm b) {
+  DLTerm unifiable(DLAtom a, DLAtom b) {
     Substitution s = a.unify(b);
     DLTerm sa = a.subst(s);
     DLTerm sb = b.subst(s);
